@@ -3,12 +3,11 @@
 require "sidekiq/testing"
 
 def sidekiq_redis_driver
-  if RUBY_ENGINE == "ruby"
-    require "hiredis"
-    :hiredis
-  else
+  # if RUBY_ENGINE == "ruby"
+  #   :hiredis
+  # else
     :ruby
-  end
+  # end
 end
 
 RSpec.configure do |config|
