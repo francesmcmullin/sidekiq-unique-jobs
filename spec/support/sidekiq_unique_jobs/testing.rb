@@ -662,7 +662,13 @@ module SidekiqUniqueJobs
       end
 
       def zscan_each(key, options = {}, &block)
-        redis { |conn| conn.zscan_each(key, options, &block) }
+        redis do |conn|
+          if conn.respond_to? :zscan_each # redis/redis-rb
+            conn.zscan_each(key, options, &block)
+          else # redis-rb/redis-client
+            conn.zscan(key, options, &block)
+          end
+        end
       end
 
       def sscan(key, cursor, options = {})
