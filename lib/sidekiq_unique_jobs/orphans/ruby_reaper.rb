@@ -290,7 +290,13 @@ module SidekiqUniqueJobs
       # @return [false] when missing
       #
       def in_sorted_set?(key, digest)
-        conn.zscan_each(key, match: "*#{digest}*", count: 1).to_a.any?
+        redis do |conn|
+          if conn.respond_to? :zscan_each # redis/redis-rb
+            conn.zscan_each(key, match: "*#{digest}*", count: 1).to_a.any?
+          else # redis-rb/redis-client
+            conn.zscan(key, match: "*#{digest}*", count: 1).to_a.any?
+          end
+        end
       end
     end
     # rubocop:enable Metrics/ClassLength

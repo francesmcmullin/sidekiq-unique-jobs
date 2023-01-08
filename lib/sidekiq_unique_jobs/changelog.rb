@@ -47,7 +47,11 @@ module SidekiqUniqueJobs
       options[:count] = count
 
       redis do |conn|
-        conn.zscan_each(key, **options).to_a.map { |entry| load_json(entry[0]) }
+        if conn.respond_to? :zscan_each # redis/redis-rb
+          conn.zscan_each(key, **options).to_a.map { |entry| load_json(entry[0]) }
+        else # redis-rb/redis-client
+          conn.zscan(key, **options).to_a.map { |entry| load_json(entry[0]) }
+        end
       end
     end
 

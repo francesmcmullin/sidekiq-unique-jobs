@@ -81,7 +81,13 @@ module SidekiqUniqueJobs
       options[:match] = pattern
       options[:count] = count
 
-      redis { |conn| conn.zscan_each(key, **options).to_a }.to_h
+      redis do |conn|
+        if conn.respond_to? :zscan_each # redis/redis-rb
+          conn.zscan_each(key, **options).to_a
+        else # redis-rb/redis-client
+          conn.zscan(key, **options).to_a
+        end
+      end.to_h
     end
 
     #
