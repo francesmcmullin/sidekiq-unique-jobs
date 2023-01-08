@@ -21,7 +21,9 @@ RSpec.configure do |config|
       sidekiq_config.redis = redis_options
     end
 
-    Sidekiq.redis = redis
+    # Mperham said not to do this https://github.com/mperham/sidekiq/issues/1662#issuecomment-40785319
+    # Also why did we have this as well as the configure_client call above?
+    # Sidekiq.redis = redis
     flush_redis
 
     if (sidekiq = example.metadata.fetch(:sidekiq, :disable))
